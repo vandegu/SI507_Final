@@ -330,7 +330,7 @@ def initialize_db():
         'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
         'Title' TEXT NOT NULL,
         'PubYear' INTEGER NOT NULL,
-        'Publisher' INTEGER NOT NULL,
+        'PublisherId' INTEGER NOT NULL,
         'Rank' INTEGER NOT NULL,
         'Rating' REAL NOT NULL,
         'NumVotesRating' INTEGER NOT NULL,
@@ -412,7 +412,7 @@ def populate_db(info_file):
 
         statement = '''
             INSERT INTO Game (
-                Title,PubYear,Publisher,Rank,Rating,NumVotesRating,Weight,MinPlaytime,MaxPlaytime,MinPlayers,MaxPlayers
+                Title,PubYear,PublisherId,Rank,Rating,NumVotesRating,Weight,MinPlaytime,MaxPlaytime,MinPlayers,MaxPlayers
             ) VALUES (
                 ?, ?, (
                     SELECT Id FROM Publisher WHERE Name=?
