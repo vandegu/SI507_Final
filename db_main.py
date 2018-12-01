@@ -68,15 +68,13 @@ def crawl_top_games(num=5):
     # Start while loop through the highest ranked games:
     collection_rank = 0
 
-    # Establish empty dict for mechanisms, designers, and publishers:
+    # Establish empty container for mechanisms, games designers, and publishers:
     tot_publishers = []
     tot_designers = []
-    tot_mechanics = {}
+    tot_mechanics = {} # This is a dict for the description as well.
+    games = [] # Will be a list of dicts.
 
     while collection_rank <= num:
-
-        # Initialize list of Boardgame class instances:
-        games = []
 
         # Get html string
         html = html_request_using_cache(burl+ext)
@@ -241,11 +239,6 @@ def create_game_instance(burl,game_ext,tp,td,tm):
                         desc_container = mech_soup.find('div',attrs={'class':"wiki",'id':"editdesc"})
                         desc = desc_container.find('p').text
                         tm[mechanism_name] = desc
-    # print(tm,mechanisms)
-
-    # Create Boardgame instance:
-    # inst = Boardgame(title,primPublisher,minPlaytime,maxPlaytime,minPlayers,maxPlayers,
-    #     weight,rating,numVotesRating,rank,year,designers,mechanisms)
 
     inst = dict(
         title=title,
@@ -334,10 +327,10 @@ def initialize_db():
         CREATE TABLE 'Game' (
         'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
         'Title' TEXT NOT NULL,
-        'PubYear' TEXT NOT NULL,
+        'PubYear' INTEGER NOT NULL,
         'Publisher' INTEGER NOT NULL,
         'Rank' INTEGER NOT NULL,
-        'Ratinhg' REAL NOT NULL,
+        'Rating' REAL NOT NULL,
         'NumVotesRating' INTEGER NOT NULL,
         'Weight' REAL NOT NULL,
         'MinPlaytime' INTEGER,
@@ -350,6 +343,7 @@ def initialize_db():
 
     conn.commit()
     print('\nSuccesfully created {}.\n'.format(DB_NAME))
+    conn.close()
 
 def populate_db(info_file):
     '''
@@ -357,7 +351,77 @@ def populate_db(info_file):
         function is the writeout file of the 'crawl_top_games' function).
     '''
 
-    
+    # Read input file:
+    with open(info_file,'r') as fr:
+        gd = json.loads(fr.read())
+
+    # Connect to the db.
+    conn = sqlite3.connect(DB_NAME)
+    cur = conn.cursor()
+
+    # Populate Publisher first (Game has connections w/Publisher...):
+    pubs = gd['tp']
+    for pub in pubs:
+        statement = '''
+            INSERT INTO Publisher (Name) VALUES (?)
+        '''
+
+        # Bug fix: Don't forget the comma to make this a legal singular tuple.
+        insertions = (pub,)
+
+        cur.execute(statement,insertions)
+        conn.commit()
+
+    # Populate Designer next, there will be m2m connections here.
+    dezs = gd['td']
+    for dez in dezs:
+        statement = '''
+            INSERT INTO Designer (Name) VALUES (?)
+        '''
+
+        # Bug fix: Don't forget the comma to make this a legal singular tuple.
+        insertions = (dez,)
+
+        cur.execute(statement,insertions)
+        conn.commit()
+
+    # Populate Mechanic. There are also m2m connections here.
+    mechs = gd['tm']
+    for mech in mechs:
+        statement = '''
+            INSERT INTO Mechanic (Name,Description) VALUES (?,?)
+        '''
+
+        # Bug fix: Don't forget the comma to make this a legal singular tuple.
+        insertions = (mech,mechs[mech])
+
+        cur.execute(statement,insertions)
+        conn.commit()
+
+    # Populate Game, the main table.
+    games = gd['games']
+    for g in games:
+
+        statement = '''
+            INSERT INTO Game (
+                Title,PubYear,Publisher,Rank,Rating,NumVotesRating,Weight,MinPlaytime,MaxPlaytime,MinPlayers,MaxPlayers
+            ) VALUES (
+                ?, ?, (
+                    SELECT Id FROM Publisher WHERE Name=?
+                ), ?, ?, ?, ?, ?, ?, ?, ?
+            )
+        '''
+
+        insertions = (
+            g['title'],int(g['pubYear'][1:-1]),g['primPublisher'],g['rank'],g['rating'],
+            g['numVotesRating'],g['weight'],g['minPlaytime'],g['maxPlaytime'],g['minPlayers'],
+            g['maxPlayers']
+        )
+
+        cur.execute(statement,insertions)
+        conn.commit()
+
+
 
 
 
@@ -401,7 +465,8 @@ if __name__=='__main__':
             -scrape : Scrape new data from the web. This can take approx. 1 hour and requires the
                       use of a Chrome driver for Selenium to work properly. Chrome driver is provided
                       in this repo for MacOS ONLY.
-            -setupDB : Initialize the database and tables.
+            -setup : Initialize the database and tables.
+            -populate : Populate the db from the information .json file.
         ''')
         exit()
 
@@ -411,6 +476,11 @@ if __name__=='__main__':
             games = crawl_top_games(num=250)
 
         # Set up db:
-        elif sys.argv[1] == '-setupDB':
+        elif sys.argv[1] == '-setup':
             print('\nInitializing database...\n')
             initialize_db()
+
+        # Populate db:
+        elif sys.argv[1] == '-populate':
+            print('\nPopulating database...\n')
+            populate_db(INFO_JSON)
