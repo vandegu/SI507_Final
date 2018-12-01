@@ -12,6 +12,8 @@ INFO_JSON = 'game_info.json'
 # Define the name of the games database.
 DB_NAME = 'games.db'
 
+
+
 def html_request_using_cache(url, header=None, CACHE_FNAME='cache.json'):
     '''
         This function uses Selenium to dynamically load a webpage with Chrome in
@@ -134,7 +136,7 @@ def create_game_instance(burl,game_ext,tp,td,tm):
     # print(title)
 
     # Year
-    # QQ Do you want to get rid of the () on the year?
+    # QQ Do you want to get rid of the () on the year? I do this in populate()
     year = js_soup.find('span',attrs={'class':"game-year"}).text
     year = year.strip()
     # print(year)
@@ -288,8 +290,8 @@ def initialize_db():
     statement =  '''
         CREATE TABLE 'M2G' (
         'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
-        'MechanicId' INTEGER NOT NULL,
-        'GameId' INTEGER NOT NULL
+        'GameId' INTEGER NOT NULL,
+        'MechanicId' INTEGER NOT NULL
         );
     '''
     cur.execute(statement)
@@ -307,8 +309,8 @@ def initialize_db():
     statement =  '''
         CREATE TABLE 'D2G' (
         'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
-        'DesignerId' INTEGER NOT NULL,
-        'GameId' INTEGER NOT NULL
+        'GameId' INTEGER NOT NULL,
+        'DesignerId' INTEGER NOT NULL
         );
     '''
     cur.execute(statement)
@@ -351,6 +353,8 @@ def populate_db(info_file):
         function is the writeout file of the 'crawl_top_games' function).
     '''
 
+    initialize_db()
+
     # Read input file:
     with open(info_file,'r') as fr:
         gd = json.loads(fr.read())
@@ -360,6 +364,7 @@ def populate_db(info_file):
     cur = conn.cursor()
 
     # Populate Publisher first (Game has connections w/Publisher...):
+    print('Populating Publisher...')
     pubs = gd['tp']
     for pub in pubs:
         statement = '''
@@ -373,6 +378,7 @@ def populate_db(info_file):
         conn.commit()
 
     # Populate Designer next, there will be m2m connections here.
+    print('Populating Designer...')
     dezs = gd['td']
     for dez in dezs:
         statement = '''
@@ -386,6 +392,7 @@ def populate_db(info_file):
         conn.commit()
 
     # Populate Mechanic. There are also m2m connections here.
+    print('Populating Mechanic...')
     mechs = gd['tm']
     for mech in mechs:
         statement = '''
@@ -399,6 +406,7 @@ def populate_db(info_file):
         conn.commit()
 
     # Populate Game, the main table.
+    print('Populating Game...')
     games = gd['games']
     for g in games:
 
@@ -421,36 +429,51 @@ def populate_db(info_file):
         cur.execute(statement,insertions)
         conn.commit()
 
+    # Populate the M2G junction table:
+    print('Populating M2G junction...')
+    for g in games:
+        for m in g['mechanisms']:
 
+            statement = '''
+                INSERT INTO M2G (GameId,MechanicId) VALUES (
+                    (
+                        SELECT Id FROM Game WHERE Title=?
+                    ),
+                    (
+                        SELECT Id FROM Mechanic WHERE Name=?
+                    )
+                )
+            '''
 
+            # Bug fix: Don't forget the comma to make this a legal singular tuple.
+            insertions = (g['title'],m)
 
+            cur.execute(statement,insertions)
+            conn.commit()
 
+    # Populate the D2G junction table:
+    print('Populating D2G junction...')
+    for g in games:
+        for d in g['designers']:
 
+            statement = '''
+                INSERT INTO D2G (GameId,DesignerId) VALUES (
+                    (
+                        SELECT Id FROM Game WHERE Title=?
+                    ),
+                    (
+                        SELECT Id FROM Designer WHERE Name=?
+                    )
+                )
+            '''
 
+            # Bug fix: Don't forget the comma to make this a legal singular tuple.
+            insertions = (g['title'],d)
 
+            cur.execute(statement,insertions)
+            conn.commit()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    print('\n{} succesfully populated.\n'.format(DB_NAME))
 
 
 
@@ -460,13 +483,15 @@ if __name__=='__main__':
         print('''
             No action specified. Try again.
 
-            ***Pass the following arguments alone***
+            ***** Pass one of the following command-line arguments when running this program *****
 
             -scrape : Scrape new data from the web. This can take approx. 1 hour and requires the
                       use of a Chrome driver for Selenium to work properly. Chrome driver is provided
                       in this repo for MacOS ONLY.
             -setup : Initialize the database and tables.
-            -populate : Populate the db from the information .json file.
+            -populate : Populate the db from the information .json file. By default, this option will
+                        also call -setup. This option should only be run after -scrape has created
+                        the information .json file in your directory.
         ''')
         exit()
 
