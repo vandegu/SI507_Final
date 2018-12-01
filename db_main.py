@@ -268,6 +268,11 @@ def create_game_instance(burl,game_ext,tp,td,tm):
 
 
 def initialize_db():
+    '''
+        Creates a database and sets up tables for storing game data, publisher data, designer
+        data, mechanics data, and junction tables for the many-to-many links between designer
+        and game as well as mechanics and game.
+    '''
 
     print('\nRemoving old {}...\n'.format(DB_NAME))
     os.remove(DB_NAME)
@@ -276,9 +281,9 @@ def initialize_db():
     conn = sqlite3.connect(DB_NAME)
     cur = conn.cursor()
 
-    # Create Mechanics table:
+    # Create Mechanic table:
     statement =  '''
-        CREATE TABLE 'Mechanics' (
+        CREATE TABLE 'Mechanic' (
         'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
         'Name' TEXT NOT NULL,
         'Description' TEXT NOT NULL
@@ -286,7 +291,7 @@ def initialize_db():
     '''
     cur.execute(statement)
 
-    # Create M2G junction table for the many2many between Mechanics and Games:
+    # Create M2G junction table for the many-to-many between Mechanic and Game:
     statement =  '''
         CREATE TABLE 'M2G' (
         'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -295,6 +300,65 @@ def initialize_db():
         );
     '''
     cur.execute(statement)
+
+    # Create the Designer table.
+    statement =  '''
+        CREATE TABLE 'Designer' (
+        'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
+        'Name' TEXT NOT NULL
+        );
+    '''
+    cur.execute(statement)
+
+    # Create the D2G junction table for the many-to-many between Designer and Game.
+    statement =  '''
+        CREATE TABLE 'D2G' (
+        'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
+        'DesignerId' INTEGER NOT NULL,
+        'GameId' INTEGER NOT NULL
+        );
+    '''
+    cur.execute(statement)
+
+    # Create the Publisher table.
+    statement =  '''
+        CREATE TABLE 'Publisher' (
+        'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
+        'Name' TEXT NOT NULL
+        );
+    '''
+    cur.execute(statement)
+
+    # Create the Game table.
+    statement =  '''
+        CREATE TABLE 'Game' (
+        'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
+        'Title' TEXT NOT NULL,
+        'PubYear' TEXT NOT NULL,
+        'Publisher' INTEGER NOT NULL,
+        'Rank' INTEGER NOT NULL,
+        'Ratinhg' REAL NOT NULL,
+        'NumVotesRating' INTEGER NOT NULL,
+        'Weight' REAL NOT NULL,
+        'MinPlaytime' INTEGER,
+        'MaxPlaytime' INTEGER,
+        'MinPlayers' INTEGER,
+        'MaxPlayers' INTEGER
+        );
+    '''
+    cur.execute(statement)
+
+    conn.commit()
+    print('\nSuccesfully created {}.\n'.format(DB_NAME))
+
+def populate_db(info_file):
+    '''
+        Populates the games DB with data from the given input file (ideally, the input of this
+        function is the writeout file of the 'crawl_top_games' function).
+    '''
+
+    
+
 
 
 
