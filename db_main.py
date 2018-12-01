@@ -4,83 +4,13 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import sys
+import sqlite3
+import os
 
+# Define the .json to hold all of the scraped information.
 INFO_JSON = 'game_info.json'
-
-# def params_unique_combination(baseurl, params):
-#     alphabetized_keys = sorted(params.keys())
-#     res = []
-#     for k in alphabetized_keys:
-#         res.append("{}-{}".format(k, params[k]))
-#     print(baseurl + "_".join(res))
-#     return baseurl + "_" + "_".join(res)
-#
-# def make_request_using_cache(baseurl,params,CACHE_FNAME='cache.json'):
-#     # Note, that the params passed to this function must be in dictionary form.
-#     try:
-#         cache_file = open(CACHE_FNAME,'r')
-#         cache_contents = cache_file.read()
-#         CACHE_DICTION = json.loads(cache_contents)
-#         cache_file.close()
-#     except:
-#         CACHE_DICTION =  {}
-#
-#     # actually make the request:
-#     unique_ident = params_unique_combination(baseurl, params)
-#
-#     if unique_ident in CACHE_DICTION:
-#         print("\nGetting cached data...\n")
-#
-#         return CACHE_DICTION[unique_ident]
-#
-#     else:
-#         # go get more new data:
-#         print("\nFetching new data from API...\n")
-#         resp = requests.get(baseurl,params)
-#         #print(resp.text,'\n\n\n')
-#         CACHE_DICTION[unique_ident] = json.loads(resp.text)
-#         dumped_json_cache = json.dumps(CACHE_DICTION)
-#         with open (CACHE_FNAME,'w') as fw: # when the file opens for writing, it clears current data.
-#             fw.write(dumped_json_cache) # I believe this method clobbers by default.
-#
-#         return CACHE_DICTION[unique_ident]
-#
-# baseurl = 'https://www.boardgamegeek.com/xmlapi2/thing?'
-# params = {'type':"boardgame",'id':"278"}
-# resp = requests.get(baseurl,params)
-# print(resp.url)
-# with open('test_resp.json','w') as fw:
-#     fw.write(resp.text)
-
-
-# def html_request_using_cache(url, header=None, CACHE_FNAME='cache.json'):
-#     unique_ident = url
-#
-#     try:
-#         cache_file = open(CACHE_FNAME,'r')
-#         cache_contents = cache_file.read()
-#         CACHE_DICTION = json.loads(cache_contents)
-#         cache_file.close()
-#     except:
-#         CACHE_DICTION = {}
-#
-#     ## first, look in the cache to see if we already have this data
-#     if unique_ident in CACHE_DICTION:
-#         #print("Getting cached data for {}...".format(unique_ident))
-#         return CACHE_DICTION[unique_ident]
-#
-#     ## if not, fetch the data afresh, add it to the cache,
-#     ## then write the cache to file
-#     else:
-#         #print("Making a request for new data from {}...".format(unique_ident))
-#         # Make the request and cache the new data
-#         resp = requests.get(url, headers=header)
-#         CACHE_DICTION[unique_ident] = resp.text
-#         dumped_json_cache = json.dumps(CACHE_DICTION)
-#         fw = open(CACHE_FNAME,"w")
-#         fw.write(dumped_json_cache)
-#         fw.close() # Close the open file
-#         return CACHE_DICTION[unique_ident]
+# Define the name of the games database.
+DB_NAME = 'games.db'
 
 def html_request_using_cache(url, header=None, CACHE_FNAME='cache.json'):
     '''
@@ -120,29 +50,6 @@ def html_request_using_cache(url, header=None, CACHE_FNAME='cache.json'):
         fw.write(dumped_json_cache)
         fw.close() # Close the open file
         return CACHE_DICTION[unique_ident]
-
-
-
-class Boardgame(object):
-    def __init__(self,title,primPublisher,minPlaytime,maxPlaytime,minPlayers,maxPlayers,
-            weight,rating,numVotesRating,rank,pubYear,designer,mechanisms):
-        self.title = title
-        self.rank = rank
-        self.primPublisher = primPublisher
-        self.minPlaytime = minPlaytime
-        self.maxPlaytime = maxPlaytime
-        self.minPlayers = minPlayers
-        self.maxPlayers = maxPlayers
-        self.weight = weight
-        self.rating = rating
-        self.numVotesRating = numVotesRating
-        self.rank = rank
-        self.pubYear = pubYear
-        self.designer = designer
-        self.mechanisms = mechanisms
-
-    def __str__(self,):
-        return('{} {}, published by {}, is ranked {}'.format(self.title,self.pubYear,self.primPublisher,self.rank))
 
 
 
@@ -360,6 +267,37 @@ def create_game_instance(burl,game_ext,tp,td,tm):
 
 
 
+def initialize_db():
+
+    print('\nRemoving old {}...\n'.format(DB_NAME))
+    os.remove(DB_NAME)
+
+    print('\nCreating new {}...\n'.format(DB_NAME))
+    conn = sqlite3.connect(DB_NAME)
+    cur = conn.cursor()
+
+    # Create Mechanics table:
+    statement =  '''
+        CREATE TABLE 'Mechanics' (
+        'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
+        'Name' TEXT NOT NULL,
+        'Description' TEXT NOT NULL
+        );
+    '''
+    cur.execute(statement)
+
+    # Create M2G junction table for the many2many between Mechanics and Games:
+    statement =  '''
+        CREATE TABLE 'M2G' (
+        'Id' INTEGER PRIMARY KEY AUTOINCREMENT,
+        'MechanicId' INTEGER NOT NULL,
+        'GameId' INTEGER NOT NULL
+        );
+    '''
+    cur.execute(statement)
+
+
+
 
 
 
@@ -391,10 +329,24 @@ def create_game_instance(burl,game_ext,tp,td,tm):
 if __name__=='__main__':
 
     if len(sys.argv) <= 1:
-        print('No action specified. Try again.')
+        print('''
+            No action specified. Try again.
+
+            ***Pass the following arguments alone***
+
+            -scrape : Scrape new data from the web. This can take approx. 1 hour and requires the
+                      use of a Chrome driver for Selenium to work properly. Chrome driver is provided
+                      in this repo for MacOS ONLY.
+            -setupDB : Initialize the database and tables.
+        ''')
         exit()
 
     else:
         # Scrape for data:
         if sys.argv[1] == '-scrape':
             games = crawl_top_games(num=250)
+
+        # Set up db:
+        elif sys.argv[1] == '-setupDB':
+            print('\nInitializing database...\n')
+            initialize_db()
