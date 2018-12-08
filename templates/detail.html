@@ -16,4 +16,23 @@
       {% endfor %}
     </ul>
 
+{% elif choice == 'designer' %}
+
+    <h2>Number of Games Designed in the Top 250: {{info[1]}}</h2>
+    <h2>Average Rating of Games: {{'{:1.2f}'.format(info[2])}}</h2>
+    <h2>Average Weight (i.e., complexity) of Games: {{'{:1.2f}'.format(info[3])}}</h2>
+    <h2>Average Playtime of Games: {{'{:1.2f}'.format(info[4])}} minutes</h2>
+
+{% elif choice == 'publisher' %}
+
+    <h2>Number of Games Published in the Top 250: {{info[1]}}</h2>
+    <h2>Average Rating of Games: {{'{:1.2f}'.format(info[2])}}</h2>
+    <h2>Average Weight (i.e., complexity) of Games: {{'{:1.2f}'.format(info[3])}}</h2>
+    <h2>Average Playtime of Games: {{'{:1.2f}'.format(info[4])}} minutes</h2>
+
 {% endif %}
+
+<form action="/displaylist" method="POST">
+  <input type="hidden" name="browseby" value={{choice}}>
+  <input type="submit" name="update" value="Back"/>
+</form>

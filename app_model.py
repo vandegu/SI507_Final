@@ -17,14 +17,14 @@ def get_plot_data(type):
             JOIN D2G AS jxn ON jxn.DesignerId = d.Id
             JOIN Game AS g ON jxn.GameId = g.Id
             GROUP BY d.Id
-            ORDER BY AVG(g.Rating) DESC
+            /*ORDER BY AVG(g.Rating) DESC
         '''
     elif type == 'publisher':
         statement = '''
             SELECT p.Id,p.Name,AVG(g.Rating),AVG(g.Weight) FROM Game as g
             JOIN Publisher AS p ON g.PublisherId = p.Id
             GROUP BY p.Id
-            ORDER BY AVG(g.Rating) DESC
+            /*ORDER BY AVG(g.Rating) DESC
         '''
 
     conn = sql.connect(DBNAME)
