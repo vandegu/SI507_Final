@@ -1,0 +1,19 @@
+<h1>{{nm}}</h1>
+
+{% if choice == 'title' %}
+
+    <h2>Publication Year: {{info[1]}}</h2>
+    <h2>Publisher: {{info[2]}}</h2>
+    <h2>Overall Rank: {{info[3]}}</h2>
+    <h2>Rating (number of votes): {{info[4]}} ({{info[5]}})</h2>
+    <h2>Weight (i.e., complexity): {{info[6]}}</h2>
+    <h2>Playtime: {{info[7]}}-{{info[8]}} minutes</h2>
+    <h2>Number of Players Supported: {{info[9]}}-{{info[10]}} players</h2>
+    <h2>Mechanics:</h2>
+    <ul>
+      {% for mech in mechs %}
+      <li>{{mech[0]}}</li>
+      {% endfor %}
+    </ul>
+
+{% endif %}

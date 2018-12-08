@@ -63,3 +63,63 @@ def create_plotly(d):
     plot_div = py.offline.plot(fig, show_link=False, output_type="div", include_plotlyjs=True)
 
     return plot_div
+
+def get_detail_data(choice,name):
+
+    conn = sql.connect(DBNAME)
+    cur = conn.cursor()
+
+    if choice == 'title':
+        statement = '''
+            SELECT g.Title,g.PubYear,p.Name,g.Rank,g.Rating,g.NumVotesRating,g.Weight,g.MinPlaytime,g.MaxPlaytime,g.MinPlayers,g.MaxPlayers
+            FROM Game AS g JOIN Publisher AS p ON g.PublisherId=p.Id
+            WHERE g.Title='{}'
+        '''.format(name)
+        cur.execute(statement)
+        info = []
+        for r in cur:
+            info.append(r)
+
+        statement = '''
+            SELECT m.Name FROM Mechanic AS m
+            JOIN M2G AS jxn ON jxn.MechanicId = m.Id
+            JOIN Game AS g ON jxn.GameId = g.Id
+            WHERE g.Title='{}'
+        '''.format(name)
+        cur.execute(statement)
+        mechs = []
+        for r in cur:
+            mechs.append(r)
+
+        return info,mechs
+
+    elif choice == 'designer':
+        statement = '''
+            SELECT d.Name, COUNT(*), AVG(g.Rating), AVG(g.Weight), AVG((g.MaxPlaytime+g.MinPlaytime)/2) FROM Designer AS d
+            JOIN D2G AS jxn ON jxn.DesignerId = d.Id
+            JOIN Game AS g ON jxn.GameId = g.Id
+            GROUP BY d.Id
+            HAVING d.Name='{}'
+        '''.format(name)
+        cur.execute(statement)
+        info = []
+        for r in cur:
+            info.append(r)
+        mechs = []
+
+        return info,mechs
+
+    elif choice == 'publisher':
+        statement = '''
+            SELECT p.Name, COUNT(*), AVG(g.Rating), AVG(g.Weight), AVG((g.MaxPlaytime+g.MinPlaytime)/2) FROM Publisher AS p
+            JOIN Game AS g ON p.Id = g.PublisherId
+            GROUP BY p.Id
+            HAVING p.Name='{}'
+        '''.format(name)
+        cur.execute(statement)
+        info = []
+        for r in cur:
+            info.append(r)
+        mechs = []
+
+        return info,mechs

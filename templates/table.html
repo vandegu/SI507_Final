@@ -1,5 +1,6 @@
+<link rel="stylesheet" href="/static/style.css">
 
-{{plot}}
+<!-- {{plot}}  -->
 
 <table border=1>
     <tr>
@@ -11,7 +12,7 @@
 {% for s in datalist %}
     <tr>
         <td>{{s[0]}}</td>
-        <td>{{s[1]}}</td>
+        <td><a href='/detail/{{s[1].replace(' ','+')}}'>{{s[1]}}</a></td>
         <td>{{'{:4.4s}'.format(s[2])}}</td>
         <td>{{'{:4.4s}'.format(s[3])}}</td>
     </tr>

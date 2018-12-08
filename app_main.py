@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, Markup
 import app_model as m # Import the model functions and variables
 
+choice = ''
+
 app = Flask(__name__)
 
 @app.route("/")
@@ -10,6 +12,7 @@ def index():
 
 @app.route("/displaylist",methods=["POST"])
 def displaylist():
+    global choice
     if request.form["browseby"] == 'title':
         col_head = ['Game Title','Rating','Weight']
     elif request.form["browseby"] == 'designer':
@@ -22,6 +25,15 @@ def displaylist():
     plot_div = m.create_plotly(tabledata)
 
     return render_template("table.html",col_head=col_head,datalist=tabledata,plot=Markup(plot_div))
+
+@app.route('/detail/<nm>')
+def detail(nm):
+    global choice
+    nm = nm.replace('+',' ')
+    info,mechs = m.get_detail_data(choice,nm)
+    info = info[0]
+
+    return render_template("detail.html",nm=nm,choice=choice,info=info,mechs=mechs)
 
 
 
