@@ -1,0 +1,19 @@
+
+{{plot}}
+
+<table border=1>
+    <tr>
+        <th>ID</th>
+        <th>{{col_head[0]}}</th>
+        <th>{{col_head[1]}}</th>
+        <th>{{col_head[2]}}</th>
+    </tr>
+{% for s in datalist %}
+    <tr>
+        <td>{{s[0]}}</td>
+        <td>{{s[1]}}</td>
+        <td>{{'{:4.4s}'.format(s[2])}}</td>
+        <td>{{'{:4.4s}'.format(s[3])}}</td>
+    </tr>
+{% endfor %}
+</table>

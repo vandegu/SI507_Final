@@ -1,0 +1,12 @@
+<h1>Welcome to GameFinder!</h1>
+<h2>Select how you would like to browse board games, or press "Find a Game"</h2>
+
+<form action="/displaylist" method="POST">
+    Sort By:<br/>
+    <input type="radio" name="browseby" value="title"/> Game Title <br/>
+    <input type="radio" name="browseby" value="designer"/> Game Designer <br/>
+    <input type="radio" name="browseby" value="publisher"/> Game Publisher <br/>
+    <br/>
+    <br/>
+    <input type="submit" name="update" value="Submit"/>
+</form>
