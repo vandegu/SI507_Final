@@ -22,7 +22,7 @@ def displaylist():
     choice = request.form["browseby"] # Keep the request format of this variable above for readability.
 
     tabledata = m.get_plot_data(choice)
-    plot_div = m.create_plotly(tabledata)
+    plot_div = m.create_plotly(tabledata,choice)
 
     return render_template("table.html",col_head=col_head,datalist=tabledata,plot=Markup(plot_div))
 

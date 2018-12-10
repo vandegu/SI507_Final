@@ -1,14 +1,21 @@
+<html>
+<head>
+  <link rel = "stylesheet" type = "text/css" href = "{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
 <h1>{{nm}}</h1>
 
 {% if choice == 'title' %}
 
-    <h2>Publication Year: {{info[1]}}</h2>
-    <h2>Publisher: {{info[2]}}</h2>
-    <h2>Overall Rank: {{info[3]}}</h2>
-    <h2>Rating (number of votes): {{info[4]}} ({{info[5]}})</h2>
-    <h2>Weight (i.e., complexity): {{info[6]}}</h2>
-    <h2>Playtime: {{info[7]}}-{{info[8]}} minutes</h2>
-    <h2>Number of Players Supported: {{info[9]}}-{{info[10]}} players</h2>
+    <h2>Publication Year: <div id='data'>{{info[1]}}</div></h2>
+    <h2>Publisher: <div id='data'>{{info[2]}}</div></h2>
+    <h2>Overall Rank: <div id='data'>{{info[3]}}</div></h2>
+    <h2>Rating (number of votes): <div id='data'>{{info[4]}} ({{info[5]}})</div></h2>
+    <h2>Weight (i.e., complexity): <div id='data'>{{info[6]}}</div></h2>
+    <h2>Playtime: <div id='data'>{{info[7]}}-{{info[8]}} minutes</div></h2>
+    <h2>Number of Players Supported: <div id='data'>{{info[9]}}-{{info[10]}} players</div></h2>
     <h2>Mechanics:</h2>
     <ul>
       {% for mech in mechs %}
@@ -18,17 +25,17 @@
 
 {% elif choice == 'designer' %}
 
-    <h2>Number of Games Designed in the Top 250: {{info[1]}}</h2>
-    <h2>Average Rating of Games: {{'{:1.2f}'.format(info[2])}}</h2>
-    <h2>Average Weight (i.e., complexity) of Games: {{'{:1.2f}'.format(info[3])}}</h2>
-    <h2>Average Playtime of Games: {{'{:1.2f}'.format(info[4])}} minutes</h2>
+    <h2>Number of Games Designed in the Top 250: <div id='data'>{{info[1]}}</div></h2>
+    <h2>Average Rating of Games: <div id='data'>{{'{:1.2f}'.format(info[2])}}</div></h2>
+    <h2>Average Weight (i.e., complexity) of Games: <div id='data'>{{'{:1.2f}'.format(info[3])}}</div></h2>
+    <h2>Average Playtime of Games: <div id='data'><div id='data'>{{'{:1.2f}'.format(info[4])}} minutes</div></h2>
 
 {% elif choice == 'publisher' %}
 
-    <h2>Number of Games Published in the Top 250: {{info[1]}}</h2>
-    <h2>Average Rating of Games: {{'{:1.2f}'.format(info[2])}}</h2>
-    <h2>Average Weight (i.e., complexity) of Games: {{'{:1.2f}'.format(info[3])}}</h2>
-    <h2>Average Playtime of Games: {{'{:1.2f}'.format(info[4])}} minutes</h2>
+    <h2>Number of Games Published in the Top 250: <div id='data'>{{info[1]}}</div></h2>
+    <h2>Average Rating of Games: <div id='data'>{{'{:1.2f}'.format(info[2])}}</div></h2>
+    <h2>Average Weight (i.e., complexity) of Games: <div id='data'>{{'{:1.2f}'.format(info[3])}}</div></h2>
+    <h2>Average Playtime of Games: <div id='data'>{{'{:1.2f}'.format(info[4])}} minutes</div></h2>
 
 {% endif %}
 
@@ -36,3 +43,9 @@
   <input type="hidden" name="browseby" value={{choice}}>
   <input type="submit" name="update" value="Back"/>
 </form>
+
+
+
+
+</body>
+</html>

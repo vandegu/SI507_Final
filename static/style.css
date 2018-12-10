@@ -1,3 +1,90 @@
-.plott {
-  width = 100 px
+body.homebody {
+  background-image: url("/static/bg.jpg");
+  background-size: 1400px
+}
+
+h1 {color: green}
+
+h1 {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  color: #4CAF50
+}
+
+h2 {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  color: #4CAF50
+}
+
+div.container {
+  text-align: center;
+}
+
+div.homescreen {
+  margin-left:auto;
+  margin-right:auto;
+  width:400px;
+  border-style: solid;
+  border-color: #4CAF50;
+  border-radius: 10px;
+  display: inline-block;
+  background-color: rgba(255,255,255,0.6);
+}
+
+#title {
+  text-align: center;
+}
+
+#datatable {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 90%;
+  margin: 5%;
+}
+
+#datatable td, #datatable th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#datatable tr:nth-child(even){background-color: #f2f2f2;}
+
+#datatable tr:hover {background-color: #ddd;}
+
+#datatable th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: #4CAF50;
+  color: white;
+}
+
+#footer {
+  position: relative;
+  top: 0.1em;
+  outline-style: hidden;
+  outline-color: rgb(255, 0, 0);
+  outline-width: 2.4em;
+  color: blue;
+  width: 20%;
+  margin: auto;
+  border: 0.3em solid #4CAF50;
+  text-align: center;
+}
+
+input[type=button], input[type=submit], input[type=reset] {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 16px 32px;
+  text-decoration: none;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+#data {
+  color: black
+}
+
+ul {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
 }

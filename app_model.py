@@ -38,7 +38,7 @@ def get_plot_data(type):
     return np.array(out)
 
 
-def create_plotly(d):
+def create_plotly(d,choice):
 
     data = dict(
             type = 'scatter',

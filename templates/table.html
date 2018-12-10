@@ -1,22 +1,45 @@
-<link rel="stylesheet" href="/static/style.css">
+<html>
+<head>
+  <link rel = "stylesheet" type = "text/css" href = "{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
 
 <!-- {{plot}}  -->
 
-<div style="height:500px;width:450px;overflow:auto;">
-<table border=1>
+{{plot}}
+
+<h1 id='title'>Click on a name to learn more!</h1>
+
+<div id="tablediv">
+<table id="datatable">
     <tr>
         <th>ID</th>
         <th>{{col_head[0]}}</th>
         <th>{{col_head[1]}}</th>
         <th>{{col_head[2]}}</th>
     </tr>
-{% for s in datalist %}
-    <tr>
-        <td>{{s[0]}}</td>
-        <td><a href='/detail/{{s[1].replace(' ','+')}}'>{{s[1]}}</a></td>
-        <td>{{'{:4.4s}'.format(s[2])}}</td>
-        <td>{{'{:4.4s}'.format(s[3])}}</td>
-    </tr>
-{% endfor %}
+    {% for s in datalist %}
+        <tr>
+            <td>{{s[0]}}</td>
+            <td><a href='/detail/{{s[1].replace(' ','+')}}'>{{s[1]}}</a></td>
+            <td>{{'{:4.4s}'.format(s[2])}}</td>
+            <td>{{'{:4.4s}'.format(s[3])}}</td>
+        </tr>
+    {% endfor %}
 </table>
 </div>
+
+<div>
+  <h2 id='footer'>
+    <a href="#">
+    Top
+    </a>
+  </h2>
+</div>
+
+
+
+
+</body>
+</html>
