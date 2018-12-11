@@ -1,6 +1,6 @@
 body.homebody {
   background-image: url("/static/bg.jpg");
-  background-size: 1400px
+  background-size: 1600px
 }
 
 h1 {color: green}
@@ -15,8 +15,17 @@ h2 {
   color: #4CAF50
 }
 
+.text {
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+ul.detaillist {
+    list-style-type: none;
+}
+
 div.container {
   text-align: center;
+  padding: 100px;
 }
 
 div.homescreen {
@@ -27,7 +36,7 @@ div.homescreen {
   border-color: #4CAF50;
   border-radius: 10px;
   display: inline-block;
-  background-color: rgba(255,255,255,0.6);
+  background-color: rgba(255,255,255,0.7);
 }
 
 #title {
@@ -79,6 +88,7 @@ input[type=button], input[type=submit], input[type=reset] {
   text-decoration: none;
   margin: 4px 2px;
   cursor: pointer;
+  font-size: 16
 }
 
 #data {

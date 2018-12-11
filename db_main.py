@@ -55,7 +55,7 @@ def html_request_using_cache(url, header=None, CACHE_FNAME='cache.json'):
 
 
 
-def crawl_top_games(num=5):
+def crawl_top_games(num=5,cache_file='cache.json',info_dict_file=INFO_JSON):
     '''
         This function crawls the top-ranked list on boardgamegeek.com and scrapes information
         from each game.
@@ -79,7 +79,7 @@ def crawl_top_games(num=5):
     while collection_rank <= num:
 
         # Get html string
-        html = html_request_using_cache(burl+ext)
+        html = html_request_using_cache(burl+ext,CACHE_FNAME=cache_file)
         html_soup = BeautifulSoup(html, 'html.parser')
 
         # Find the primary table:
@@ -99,7 +99,7 @@ def crawl_top_games(num=5):
                 game_ext = game_ext_container.find('a').get('href')
                 game_name = game_ext_container.find('a').text
                 print('scraping rank {}: {}'.format(collection_rank,game_name))
-                a_game,tp,td,tm = create_game_instance(burl,game_ext,tot_publishers,tot_designers,tot_mechanics)
+                a_game,tp,td,tm = create_game_instance(burl,game_ext,tot_publishers,tot_designers,tot_mechanics,CACHE_FNAME=cache_file)
                 games.append(a_game)
 
         # Grab the url for the next page:
@@ -113,21 +113,21 @@ def crawl_top_games(num=5):
     )
 
     # Save game info dictionary as json.
-    with open(INFO_JSON,'w') as fw:
+    with open(info_dict_file,'w') as fw:
         fw.write(json.dumps(game_info))
 
     return game_info
 
 
 
-def create_game_instance(burl,game_ext,tp,td,tm):
+def create_game_instance(burl,game_ext,tp,td,tm,CACHE_FNAME='cache.json'):
     '''
         This function creates a Boardgame instance of a game by scraping its page. This function
         also keeps track of all unique publishers, designers, and mechanics (as well as
         recording the text for each mechanic).
     '''
 
-    html = html_request_using_cache(burl+game_ext+'/stats')
+    html = html_request_using_cache(burl+game_ext+'/stats',CACHE_FNAME=CACHE_FNAME)
     js_soup = BeautifulSoup(html, 'html.parser')
 
     # Title
@@ -205,7 +205,7 @@ def create_game_instance(burl,game_ext,tp,td,tm):
     # print(rank)
 
     # Find credits page and load it.
-    html = html_request_using_cache(burl+game_ext+'/credits')
+    html = html_request_using_cache(burl+game_ext+'/credits',CACHE_FNAME=CACHE_FNAME)
     js_soup = BeautifulSoup(html, 'html.parser')
 
     # Designers:
@@ -236,7 +236,7 @@ def create_game_instance(burl,game_ext,tp,td,tm):
                     if mechanism_name not in tm:
                         mechanism_url = mechanism.get('href')
                         # Grab the description of the mechanism:
-                        html = html_request_using_cache(burl+mechanism_url)
+                        html = html_request_using_cache(burl+mechanism_url,CACHE_FNAME=CACHE_FNAME)
                         mech_soup = BeautifulSoup(html, 'html.parser')
                         desc_container = mech_soup.find('div',attrs={'class':"wiki",'id':"editdesc"})
                         desc = desc_container.find('p').text

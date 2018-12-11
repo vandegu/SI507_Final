@@ -3,7 +3,10 @@
   <link rel = "stylesheet" type = "text/css" href = "{{ url_for('static', filename='style.css') }}">
 </head>
 
-<body>
+<body class="homebody">
+
+<div class='container'>
+<div class='homescreen'>
 
 <h1>{{nm}}</h1>
 
@@ -17,11 +20,11 @@
     <h2>Playtime: <div id='data'>{{info[7]}}-{{info[8]}} minutes</div></h2>
     <h2>Number of Players Supported: <div id='data'>{{info[9]}}-{{info[10]}} players</div></h2>
     <h2>Mechanics:</h2>
-    <ul>
-      {% for mech in mechs %}
-      <li>{{mech[0]}}</li>
-      {% endfor %}
-    </ul>
+
+    {% for mech in mechs %}
+    <div class='text'>{{mech[0]}}</div>
+    {% endfor %}
+    </br>
 
 {% elif choice == 'designer' %}
 
@@ -44,7 +47,8 @@
   <input type="submit" name="update" value="Back"/>
 </form>
 
-
+</div>
+</div>
 
 
 </body>

@@ -40,6 +40,13 @@ def get_plot_data(type):
 
 def create_plotly(d,choice):
 
+    if choice == 'title':
+        plottitle = 'Weight (complexity, max 5) vs. Rating (max 10) of Top 250 Board Games'
+    elif choice == 'designer':
+        plottitle = 'Average Weight (complexity, max 5) vs. Average Rating (max 10) of Game Designers'
+    elif choice == 'publisher':
+        plottitle = 'Average Weight (complexity, max 5) vs. Average Rating (max 10) of Game Publishers'
+
     data = dict(
             type = 'scatter',
             x = d[:,2],
@@ -53,7 +60,7 @@ def create_plotly(d,choice):
             ))
 
     layout = dict(
-            title = 'test2',
+            title = plottitle,
             xaxis = {'title':"Rating"},
             yaxis = {'title':"Weight"}
     )
