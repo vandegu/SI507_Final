@@ -262,18 +262,19 @@ def create_game_instance(burl,game_ext,tp,td,tm,CACHE_FNAME='cache.json'):
 
 
 
-def initialize_db():
+def initialize_db(DB_FILE=DB_NAME):
     '''
         Creates a database and sets up tables for storing game data, publisher data, designer
         data, mechanics data, and junction tables for the many-to-many links between designer
         and game as well as mechanics and game.
     '''
 
-    print('\nRemoving old {}...\n'.format(DB_NAME))
-    os.remove(DB_NAME)
+    if os.path.isfile(DB_FILE):
+        print('\nRemoving old {}...\n'.format(DB_FILE))
+        os.remove(DB_FILE)
 
-    print('\nCreating new {}...\n'.format(DB_NAME))
-    conn = sqlite3.connect(DB_NAME)
+    print('\nCreating new {}...\n'.format(DB_FILE))
+    conn = sqlite3.connect(DB_FILE)
     cur = conn.cursor()
 
     # Create Mechanic table:
@@ -344,23 +345,23 @@ def initialize_db():
     cur.execute(statement)
 
     conn.commit()
-    print('\nSuccesfully created {}.\n'.format(DB_NAME))
+    print('\nSuccesfully created {}.\n'.format(DB_FILE))
     conn.close()
 
-def populate_db(info_file):
+def populate_db(info_file,DB_FILE=DB_NAME):
     '''
         Populates the games DB with data from the given input file (ideally, the input of this
         function is the writeout file of the 'crawl_top_games' function).
     '''
 
-    initialize_db()
+    initialize_db(DB_FILE=DB_FILE)
 
     # Read input file:
     with open(info_file,'r') as fr:
         gd = json.loads(fr.read())
 
     # Connect to the db.
-    conn = sqlite3.connect(DB_NAME)
+    conn = sqlite3.connect(DB_FILE)
     cur = conn.cursor()
 
     # Populate Publisher first (Game has connections w/Publisher...):
@@ -473,7 +474,7 @@ def populate_db(info_file):
             cur.execute(statement,insertions)
             conn.commit()
 
-    print('\n{} succesfully populated.\n'.format(DB_NAME))
+    print('\n{} succesfully populated.\n'.format(DB_FILE))
 
 
 
