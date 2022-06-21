@@ -14,7 +14,7 @@ jupyter-core==4.4.0
 lxml==4.2.5
 MarkupSafe==1.1.0
 nbformat==4.4.0
-numpy==1.15.4
+numpy==1.22.0
 plotly==3.4.2
 pytz==2018.7
 requests==2.20.1
